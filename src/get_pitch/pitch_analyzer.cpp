@@ -55,7 +55,11 @@ namespace upc {
     /// \TODO Implement a rule to decide whether the sound is voiced or not.
     /// * You can use the standard features (pot, r1norm, rmaxnorm),
     ///   or compute and use other ones.
+    if(rmaxnorm>0.4){
+      return false;
+    }else{
     return true;
+    }
   }
 
   float PitchAnalyzer::compute_pitch(vector<float> & x) const {
@@ -73,12 +77,12 @@ namespace upc {
 
     vector<float>::const_iterator iR = r.begin(), iRMax = iR;
 
-    /// \TODO 
+  /// \TODO 
 	/// Find the lag of the maximum value of the autocorrelation away from the origin.<br>
 	/// Choices to set the minimum value of the lag are:
 	///    - The first negative value of the autocorrelation.
 	///    - The lag corresponding to the maximum value of the pitch.
-    ///	   .
+  ///	   .
 	/// In either case, the lag should not exceed that of the minimum value of the pitch.
 
     unsigned int lag = iRMax - r.begin();

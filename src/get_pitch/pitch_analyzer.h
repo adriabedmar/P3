@@ -16,12 +16,13 @@ namespace upc {
   ///
   class PitchAnalyzer {
   public:
+
 	/// Wndow type
     enum Window {
 		RECT, 						///< Rectangular window
 		HAMMING						///< Hamming window
 	};
-
+  float thresh1;
     void set_window(Window type); ///< pre-compute window
 
   private:

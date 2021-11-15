@@ -25,8 +25,9 @@ Usage:
     get_pitch --version
 
 Options:
-    -h, --help  Show this screen
-    --version   Show the version of the project
+    -1 FLOAT, --thresh1=FLOAT Umbral sonora/sordo para rmaxnorm default:[0.5]
+    -h, --help                Show this screen
+    --version                 Show the version of the project
 
 Arguments:
     input-wav   Wave file with the audio signal
@@ -46,6 +47,7 @@ int main(int argc, const char *argv[]) {
 
 	std::string input_wav = args["<input-wav>"].asString();
 	std::string output_txt = args["<output-txt>"].asString();
+  float thresh1 = atof(args["--thresh1"].asString().c_str());
 
   // Read input sound file
   unsigned int rate;
@@ -60,6 +62,7 @@ int main(int argc, const char *argv[]) {
 
   // Define analyzer
   PitchAnalyzer analyzer(n_len, rate, PitchAnalyzer::HAMMING, 50, 500);
+  analyzer.thresh1 = thresh1;
 
   /// \TODO
   /// Preprocess the input signal in order to ease pitch estimation. For instance,
