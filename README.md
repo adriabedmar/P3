@@ -60,8 +60,7 @@ Ejercicios básicos
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
     ```cpp
       if (pot > -48.9F && (r1norm > 0.93F || rmaxnorm > 0.45F)) return false;
-      else return true;
-      ```
+      else return true;```
 
 - Una vez completados los puntos anteriores, dispondrá de una primera versión del detector de pitch. El 
   resto del trabajo consiste, básicamente, en obtener las mejores prestaciones posibles con él.
@@ -79,6 +78,7 @@ Ejercicios básicos
 	    Recuerde configurar los paneles de datos para que el desplazamiento de ventana sea el adecuado, que
 		en esta práctica es de 15 ms.
 
+      De arriba abajo: pitch, rmaxnorm, r1norm, potencia
       ![Parametros detección sonoridad](./img/audio_pot_r1_rmax.png)
 
       Como se puede ver en la imagen el valor rmaxnorm marca los tramos sonoros con un valor superior a unos 0.5,
@@ -92,7 +92,7 @@ Ejercicios básicos
       Con los parametros por defecto que se pueden ver en la figura anterior se obtiene el siguiente resultado:
       ![Resultado optimizado para rl002.wav](./img/opt_pitch_rl002.png)
       
-      Si vemos se evalua con el programa `pitch_evaluate` se ve como se han reducido los errores:
+      Con el programa `pitch_evaluate` se ve como se han reducido los errores:
       ![Evaluación resultado optimizado para rl002.wav](./img/optimized_rl002.png)
 
   
@@ -130,45 +130,45 @@ Ejercicios de ampliación
   Entre las posibles mejoras, puede escoger una o más de las siguientes:
 
   * Técnicas de preprocesado: filtrado paso bajo, *center clipping*, etc.
-        ```cpp
-        //Iterate through the whole audio to get the minimum and maximum value to clip the file relative to their values
-        vector<float>::iterator iX;
-        for(iX = x.begin(); iX < x.end(); iX++){    
-          if(*iX > max){
-            max = *iX;
-          }   
-          if(*iX < min){      
-            min = *iX;
-          }  
-        }
-
-        if(-1*(min) > max){  
-          range = -1*(min);  
-        }else{
-          range = max;
-        } 
-        //Set the clipping range relative to the maximum, with a value of clip form 0 to 1. This value is 0 by default and can be set through the CLI
-        clip = range * clip;
-
-        //Eliminate all values lower than the threshold and substract the threshold to the higher values
-        for(iX = x.begin(); iX<x.end(); iX++){
-          if(*iX<0){
-            abs = -1*(*iX);
+          ```cpp
+          //Iterate through the whole audio to get the minimum and maximum value to clip the file relative to their values
+          vector<float>::iterator iX;
+          for(iX = x.begin(); iX < x.end(); iX++){    
+            if(*iX > max){
+              max = *iX;
+            }   
+            if(*iX < min){      
+              min = *iX;
+            }  
           }
-          else{
-            abs = *iX;
-          }
-          if(abs<clip){      
-            *iX = 0;
-          }    
-          else{
-            if(*iX > 0)        
-              *iX = *iX - clip;
-            else        
-              *iX = *iX + clip;    
+
+          if(-1*(min) > max){  
+            range = -1*(min);  
+          }else{
+            range = max;
           } 
-        }
-        ```
+          //Set the clipping range relative to the maximum, with a value of clip form 0 to 1. This value is 0 by default and can be set through the CLI
+          clip = range * clip;
+
+          //Eliminate all values lower than the threshold and substract the threshold to the higher values
+          for(iX = x.begin(); iX<x.end(); iX++){
+            if(*iX<0){
+              abs = -1*(*iX);
+            }
+            else{
+              abs = *iX;
+            }
+            if(abs<clip){      
+              *iX = 0;
+            }    
+            else{
+              if(*iX > 0)        
+                *iX = *iX - clip;
+              else        
+                *iX = *iX + clip;    
+            } 
+          }
+          ```
     Con la implementación del 'center clipping' se obtiene un resultado optimizado para el dataset de `train` del 90.96%
     ![Centre clipping optimization](./img/optimization_train.png)
     Se ha conseguido con una busqueda iterativa que usa la CLI del apartado anterior. El bucle de busca se encuentra en el fichero `scripts/optimization.sh`
