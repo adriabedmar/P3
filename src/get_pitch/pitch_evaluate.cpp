@@ -25,13 +25,10 @@ const float gross_threshold = 0.2F; //gross error:  +/-20 %
 
 static const char USAGE[] = R"(
 pitch_evaluate - Evaluate error rate of pitch evaluation
-
 Usage:
     pitch_evaluate <file-f0ref> ...
-
 Arguments:
     file-f0ref  File with the reference values of F0 (ext. .f0ref)
-
 Note:
     For each reference file, a test file is required in the same directory
     with the same base name and with extension .f0
@@ -100,7 +97,7 @@ int main(int argc, const char * argv[])  {
     nfiles++;
     
     print_results(f0ref.size(), num_voiced, num_unvoiced, num_voiced_unvoiced, num_unvoiced_voiced, 
-		  num_voiced_voiced, num_gross_errors, fine_error, ftest);
+		num_voiced_voiced, num_gross_errors, fine_error, ftest);
     cout << "--------------------------\n\n";
   }   
 

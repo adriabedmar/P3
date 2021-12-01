@@ -20,14 +20,17 @@ static const char USAGE[] = R"(
 get_pitch - Pitch Detector 
 
 Usage:
-    get_pitch [options] <input-wav> <output-txt>
+    get_pitch [options] <input-wav> <output-txt> [-p <pot>][-r <r1>][-m <rmax>][-c <clip>]
     get_pitch (-h | --help)
     get_pitch --version
 
 Options:
-    -1 FLOAT, --thresh1=FLOAT Umbral sonora/sordo para rmaxnorm default:[0.5]
-    -h, --help                Show this screen
-    --version                 Show the version of the project
+    -h, --help  Show this screen
+    --version   Show the version of the project
+    -p <pot>       Threshold to classify voiced and unvoiced with power level [default: 41]
+    -r <r1>        Threshold to classify voiced and unvoiced with r1norm level [default: 0.8]
+    -m <rmax>      Threshold to classify voiced and unvoiced with rmaxnorm level [default: 0.55]
+    -c <clip>      Threshold for the central clipping [default: 0.015]
 
 Arguments:
     input-wav   Wave file with the audio signal
@@ -44,10 +47,13 @@ int main(int argc, const char *argv[]) {
         {argv + 1, argv + argc},	// array of arguments, without the program name
         true,    // show help if requested
         "2.0");  // version string
-
+  
 	std::string input_wav = args["<input-wav>"].asString();
 	std::string output_txt = args["<output-txt>"].asString();
-  float thresh1 = atof(args["--thresh1"].asString().c_str());
+  float pot_th = std::stof(args["-p"].asString());
+  float r1_th =  std::stof(args["-r"].asString());
+  float rmax_th = std::stof(args["-m"].asString());
+  float clip = std::stof(args["-c"].asString());
 
   // Read input sound file
   unsigned int rate;
@@ -61,15 +67,53 @@ int main(int argc, const char *argv[]) {
   int n_shift = rate * FRAME_SHIFT;
 
   // Define analyzer
-  PitchAnalyzer analyzer(n_len, rate, PitchAnalyzer::HAMMING, 50, 500);
-  analyzer.thresh1 = thresh1;
+  PitchAnalyzer analyzer(n_len, rate, pot_th, r1_th, rmax_th, PitchAnalyzer::HAMMING, 50, 500);
 
   /// \TODO
   /// Preprocess the input signal in order to ease pitch estimation. For instance,
   /// central-clipping or low pass filtering may be used.
-  
-  // Iterate for each frame and save values in f0 vector
+  /// \HECHO
+  /// Central clipping
+  float max = 0, min = 0, range = 0, abs = 0;
+
+  //Iterate through the whole audio to get the minimum and maximum value to clip the file relative to their values
   vector<float>::iterator iX;
+  for(iX = x.begin(); iX < x.end(); iX++){    
+    if(*iX > max){
+      max = *iX;
+    }   
+    if(*iX < min){      
+      min = *iX;
+    }  
+  }
+
+  if(-1*(min) > max){  
+    range = -1*(min);  
+  }else{
+    range = max;
+  } 
+  //Set the clipping range relative to the maximum, with a value of clip form 0 to 1. This value is 0 by default and can be set through the CLI
+  clip = range * clip;
+
+  //Eliminate all values lower than the threshold and substract the threshold to the higher values
+  for(iX = x.begin(); iX<x.end(); iX++){
+    if(*iX<0){
+      abs = -1*(*iX);
+    }
+    else{
+      abs = *iX;
+    }
+    if(abs<clip){      
+      *iX = 0;
+    }    
+    else{
+      if(*iX > 0)        
+        *iX = *iX - clip;
+      else        
+        *iX = *iX + clip;    
+    } 
+  }
+  
   vector<float> f0;
   for (iX = x.begin(); iX + n_len < x.end(); iX = iX + n_shift) {
     float f = analyzer(iX, iX + n_len);
@@ -89,7 +133,7 @@ int main(int argc, const char *argv[]) {
 
   os << 0 << '\n'; //pitch at t=0
   for (iX = f0.begin(); iX != f0.end(); ++iX) 
-    os << *iX << '\n';
+    os << *iX << "\n";
   os << 0 << '\n';//pitch at t=Dur
 
   return 0;
