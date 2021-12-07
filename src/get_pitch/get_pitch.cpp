@@ -27,9 +27,9 @@ Usage:
 Options:
     -h, --help  Show this screen
     --version   Show the version of the project
-    -p <pot>       Threshold to classify voiced and unvoiced with power level [default: 41]
-    -r <r1>        Threshold to classify voiced and unvoiced with r1norm level [default: 0.8]
-    -m <rmax>      Threshold to classify voiced and unvoiced with rmaxnorm level [default: 0.55]
+    -p <pot>       Threshold to classify voiced and unvoiced with power level [default: 42.5]
+    -r <r1>        Threshold to classify voiced and unvoiced with r1norm level [default: 0.9]
+    -m <rmax>      Threshold to classify voiced and unvoiced with rmaxnorm level [default: 0.45]
     -c <clip>      Threshold for the central clipping [default: 0.015]
 
 Arguments:
